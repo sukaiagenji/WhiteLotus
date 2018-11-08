@@ -22,3 +22,4 @@ if (fs.existsSync('./config.json')) {
 	});
 }
 
+/* Ignore this file. Because of issues with the installation script, I will be moving everything to pure shell script. */

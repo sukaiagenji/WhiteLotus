@@ -12,9 +12,9 @@ exports.startInstallation = function () {
 		output: process.stdout
 	});
 
-	rl.question('\nAre you ready to proceed with installing the\nAlexa AVS Sample App and all dependencies? (yes/No)\n', (answeryesno) => {
-		if(answeryesno.toLowerCase() == 'yes') {
-			console.log('\n\nProceeding with installation...');
+	rl.question('\nAre you ready to proceed with installing the\nAlexa AVS Sample App and all dependencies? (yes/No)\n?', (answer) => {
+		if(answer.toLowerCase() == 'yes') {
+			console.log('\n\nProceeding with installation...\n\n');
 			doInstallation();
 		} else {
 			console.log('\n\nInstallation aborted!!!');
@@ -25,5 +25,9 @@ exports.startInstallation = function () {
 }
 
 function doInstallation() {
-	console.log('\n\nUpdating system...');
+	console.log("Updating system...\n\n")
+	const { spawnSync } = require('child_process')
+	const update = spawnSync('sudo', ['apt-get', 'udpate']);
 }
+
+/* Ignore this file. Because of issues with the installation script, I will be moving everything to pure shell script. */
