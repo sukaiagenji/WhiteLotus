@@ -3,9 +3,6 @@
 #
 # See LICENSE file for copyright and license details
 
-INTERACTIVE=true
-ASK_TO_REBOOT=0
-
 do_about() {
 whiptail --msgbox "\
 This tool provides a straight-forward way of both \
@@ -149,6 +146,28 @@ a while. It is suggested to stay close, as you'll need \
 to accept licensing during installtion.\
 " 15 60 1
 	sudo bash setup.sh $ALEXA_CONFIG_JSON -s $ALEXA_SERIAL_NUMBER
+	echo
+	echo "Changing ownership of all files back to user pi..."
+	sudo chown -R pi.pi *
+	echo
+	echo "Changing the startsample.sh script for minimal stdout..."
+	sed 's/DEBUG9/CRITICAL/g' startsample.sh
+}
+
+do_afterinstall() {
+	echo "Deleting unneeded AVS files..."
+}
+
+do_chromiuminstall() {
+	whiptail --msgbox "\
+Alexa AVS Sample App has been built. Next, Chromium and \
+required dependancies will be installed if necessary.\
+" 15 60 1
+	sudo apt-get install -y --no-install-recommends xserver-xorg x11-xserver-utils xinit openbox chromium-browser
+}
+
+do_checkstartup() {
+	#TODO - create the script to install White❀Lotus as a service on startup, including a systemctl package, then check if we're putting it in or not.
 }
 
 do_abort() {
@@ -158,3 +177,6 @@ do_abort() {
 do_start
 do_recommend
 do_ask_install
+do_afterinstall
+do_chromiuminstall
+do_checkstartup
