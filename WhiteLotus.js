@@ -4,7 +4,7 @@ var template = require('./templates/loader.js');
 const { spawn } = require('child_process');
 
 var jsonObj = {};
-var htmlObj = template(jsonObj);
+var htmlObj = template.returnHtml(jsonObj);
 
 const avsSpawn = spawn('sudo bash startsample.sh', {
 	shell: true
@@ -17,12 +17,12 @@ avsSpawn.stdout.on('data', function (data) {
 			jsonResponse = jsonResponse.substr(jsonResponse.indexOf('\{\"type\"\:'));
 			jsonResponse = jsonResponse.split(/\r?\n/);
 			jsonObj = JSON.parse(jsonResponse[0]);
-			htmlObj = template(jsonObj);
+			htmlObj = template.returnHtml(jsonObj);
 			// send Chromium refresh
 		}
 	} else if (data.indexOf('RenderTemplateCard - Cleared') {
 		jsonObj = {};
-		htmlObj = template(jsonObj);
+		htmlObj = template.returnHtml(jsonObj);
 		// send Chromium refresh
 	}
 });
