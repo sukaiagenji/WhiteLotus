@@ -138,7 +138,7 @@ do_avsinstall() {
 	wget https://raw.githubusercontent.com/alexa/avs-device-sdk/master/tools/Install/pi.sh
 	echo
 	echo "Changing the setup.sh script to allow JSON data to display..."
-	sed '/      -DCMAKE_BUILD_TYPE=DEBUG \\/a \ \ \ \ \ \ -DACSDK_EMIT_SENSITIVE_LOGS=ON \\' setup.sh
+	sed -i '/      -DCMAKE_BUILD_TYPE=DEBUG \\/a \ \ \ \ \ \ -DACSDK_EMIT_SENSITIVE_LOGS=ON \\' setup.sh
 	echo
 	whiptail --msgbox "\
 Running the Alexa AVS Sample App build. This will take \
@@ -151,7 +151,7 @@ to accept licensing during installtion.\
 	sudo chown -R pi.pi *
 	echo
 	echo "Changing the startsample.sh script for minimal stdout..."
-	sed 's/DEBUG9/CRITICAL/g' startsample.sh
+	sed -i 's/DEBUG9/CRITICAL/' startsample.sh
 }
 
 do_afterinstall() {
