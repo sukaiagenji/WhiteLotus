@@ -227,7 +227,7 @@ do_startupinstall() {
 @xset s off
 @xset -dpms
 @xset s noblank
-@chromium-browser --start-fullscreen --disable-infobars http://localhost:8080/alexa-ctrlprt/
+@chromium-browser --start-fullscreen --disable-infobars --app=http://localhost:8080/alexa-ctrlprt/
 EOT
 	xdg-settings set default-web-browser chromium.desktop
 	else
