@@ -1,0 +1,37 @@
+html, body {
+	height: 100%;
+	max-height: 100%;
+	overflow: hidden;
+	font-size: 12px;
+}	
+
+table, th, td {
+	vertical-align: middle;
+}
+
+.title {
+	color: #151320;
+	font-size: 1.5em;
+	font-family: "Amazon Ember Display";
+	padding-top: 5.25%;
+}
+
+.subtitle {
+	color: #827f8f;
+	font-size: 1.5em;
+	font-family: "Amazon Ember Display Light";
+	padding-top: 2%;
+}
+
+.textbox {
+	color: #000000;
+	font-size: 1.25em;
+	font-family: "Amazon Ember Display Light";
+	text-align: left;
+	line-height: 1em;
+}
+
+img {
+	display: block;
+	width: 100%;
+}

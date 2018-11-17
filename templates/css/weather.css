@@ -1,0 +1,74 @@
+html, body {
+	height: 100%;
+	max-height: 100%;
+	overflow: hidden;
+	font-size: 75%;
+}	
+
+table, th, td {
+	text-align: center;
+	vertical-align: middle;
+}
+
+.title {
+	color: #151320;
+	font-size: 1.5em;
+	font-family: "Amazon Ember Display";
+	padding-top: 5.25%;
+}
+
+.subtitle {
+	color: #827f8f;
+	font-size: 1.5em;
+	font-family: "Amazon Ember Display Light";
+	padding-top: 2%;
+}
+
+.date {
+	color: #151320;
+	font-size: 1em;
+	font-family: "Amazon Ember Display";
+}
+
+.smallhigh {
+	color: #151320;
+	font-size: 1em;
+	font-family: "Amazon Ember Display";
+	display: inline-block;
+}
+
+.smalllow {
+	color: #a9aba9;
+	font-size: 1em;
+	font-family: "Amazon Ember Display Light";
+	display: inline-block;
+}
+
+.currenttemp {
+	color: #151320;
+	font-size: 7em;
+	font-family: "Amazon Ember Display Light";
+	text-align: center;
+	vertical-align: middle;
+}
+
+.largehigh {
+	color: #151320;
+	font-size: 3em;
+	font-family: "Amazon Ember Display Light";
+	text-align: right;
+}
+
+.largelow {
+	color: #827f8f;
+	font-size: 3em;
+	font-family: "Amazon Ember Display Light";
+	text-align: right;
+}
+
+.weathericon {
+	width: 100%;
+	vertical-align: middle;
+	text-align: center;
+}
+	

@@ -1,0 +1,26 @@
+{
+  "name": "WhiteLotus",
+  "version": "0.1.0-a",
+  "description": "A frontend for the Raspberry Pi Alexa AVS that enables card display via Chromium.",
+  "main": "WhiteLotus.js",
+  "dependencies": {
+    "express": "^4.16.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sukaiagenji/WhiteLotus.git"
+  },
+  "keywords": [
+    "alexa"
+  ],
+  "author": "Sukaia Genji",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/sukaiagenji/WhiteLotus/issues"
+  },
+  "homepage": "https://github.com/sukaiagenji/WhiteLotus#readme"
+}

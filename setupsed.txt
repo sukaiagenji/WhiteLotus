@@ -1,0 +1,2 @@
+  sudo sed -i "/#include\ <sstream>/a #include\ <cstdlib>" $INSTALL_BASE/avs-device-sdk/SampleApp/src/UIManager.cpp
+  sudo sed -i "/                ConsolePrinter::prettyPrint(\"Listening...\");/a \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ system(\"play $SOUNDS_DIR/ful_ui_wakesound.wav\");" $INSTALL_BASE/avs-device-sdk/SampleApp/src/UIManager.cpp
