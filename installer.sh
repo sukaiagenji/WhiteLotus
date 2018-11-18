@@ -196,8 +196,7 @@ required dependancies will be installed if necessary.\
 " 15 60 1
 	sudo apt-get install -y --no-install-recommends xdotool nodejs npm
 	echo "Finding current Raspbian Stretch version, Lite or Desktop..."
-	DESKTOPCHECK=$(dpkg --list | grep '^ii' | grep 'raspberrypi-ui-mods')
-	if [ ! $? -eq 0 ]; then
+	if [[ -z $(dpkg -l | grep 'raspberrypi-ui-mods') ]]; then
 		echo "Using Lite mode. Installing necessary apt packages..."
 		sudo apt-get install -y --no-install-recommends xserver-xorg x11-xserver-utils xinit openbox chromium-browser gstreamer1.0-alsa gstreamer1.0-libav
 	fi
@@ -220,8 +219,7 @@ everything when your Raspberry Pi is plugged in.
 
 do_startupinstall() {
 	echo "Finding current Raspbian Stretch version, Lite or Desktop..."
-	DESKTOPCHECK=$(dpkg --list | grep '^ii' | grep 'raspberrypi-ui-mods')
-	if [ $DESKTOPCHECK -eq 0 ]; then
+	if [[ ! -z $(dpkg -l | grep 'raspberrypi-ui-mods') ]]; then
 		echo "Using Desktop mode. Installing necessary scripts..."
 		sudo cat <<EOT >> ~/.config/lxsession/LXDE-pi/autostart
 @node $INSTALL_DIR/WhiteLotus.js
