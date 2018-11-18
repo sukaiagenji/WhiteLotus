@@ -3,6 +3,9 @@
 #
 # See LICENSE file for copyright and license details
 
+set -o errexit  # Exit the script if any statement fails.
+set -o nounset  # Exit the script if any uninitialized variable is used.
+
 WAKEWORD_ON=false
 INSTALL_DIR=$(pwd)
 
@@ -34,12 +37,10 @@ Pi.\
 }
 
 do_ask_install() {
-	whiptail --yesno "Are you ready to begin installing White❀Lotus?" --defaultno 15 60 2
-	RET=$?
-	if [ $RET -eq 0 ]; then
+	if (whiptail --yesno "Are you ready to begin installing White❀Lotus?" --defaultno 15 60 2); then
 		do_envcheck
-	elif [ $RET -eq 1 ]; then
-		do_abort
+	else
+		exit 1
 	fi
 }
 
@@ -56,11 +57,9 @@ Please upgrade to Raspbian Stretch to continue.\
 }
 
 do_alexaconfig () {
-	whiptail --yesno "Have you downloaded your AVS credentials JSON file (config.json)?" --defaultno 15 60 2
-	RET=$?
-	if [ $RET -eq 0 ]; then
+	if (whiptail --yesno "Have you downloaded your AVS credentials JSON file (config.json)?" --defaultno 15 60 2); then
 		ALEXA_CONFIG_JSON=$(whiptail --inputbox "Please enter the absolute path to your config.json file." 15 60 "$INSTALL_DIR/config.json" 3>&1 1>&2 2>&3)
-	elif [ $RET -eq 1 ]; then
+	else
 		whiptail --msgbox "\
 Please input your AVS credentials. You will need both your \
 Client ID and Client ID name from the 'Other devices and \
@@ -87,7 +86,7 @@ do_avsclientid() {
 		fi
 		do_avsproductid
 	else
-		do_abort
+		exit 1
 	fi
 }
 
@@ -102,7 +101,7 @@ do_avsproductid() {
 		do_avsconfigwrite
 		do_avsproductserial
 	else
-		do_abort
+		exit 1
 	fi
 }
 
@@ -129,16 +128,18 @@ do_avsproductserial() {
 		fi
 		do_avsinstall
 	else
-		do_abort
+		exit 1
 	fi
 }
 
 
 do_avsinstall() {
 	echo "Downloading necessary installation files..."
-	mkdir AlexaAVS
+	if [[ ! -d AlexaAVS ]]; then
+		mkdir AlexaAVS
+	fi
 	pushd AlexaAVS
-	sudo rm -f *
+	sudo rm -f *.sh
 	cp $ALEXA_CONFIG_JSON .
 	wget https://raw.githubusercontent.com/alexa/avs-device-sdk/master/tools/Install/setup.sh
 	wget https://raw.githubusercontent.com/alexa/avs-device-sdk/master/tools/Install/genConfig.sh
@@ -147,13 +148,11 @@ do_avsinstall() {
 	echo "Changing the setup.sh script to allow JSON data to display..."
 	sed -i '/      -DCMAKE_BUILD_TYPE=DEBUG \\/a \ \ \ \ \ \ -DACSDK_EMIT_SENSITIVE_LOGS=ON \\' setup.sh
 	sed -i 's/pip install flask commentjson/pip3 install flask commentjson/' pi.sh
-	whiptail --yesno "Would you like to install a Wake Word sound?" 15 60 2
-	RET=$?
-	if [ $RET -eq 0 ]; then
+	if (whiptail --yesno "Would you like to install a Wake Word sound?" 15 60 2); then
 		sed -i "/GSTREAMER_AUDIO_SINK=\"autoaudiosink\"/a SOUNDS_DIR=$INSTALL_DIR/sounds" $INSTALL_DIR/AlexaAVS/setup.sh
 		sed -i "/  echo \"==============> BUILDING SDK ==============\"/r $INSTALL_DIR/setupsed.txt" $INSTALL_DIR/AlexaAVS/setup.sh
 		WAKEWORD_ON=true
-	elif [ $RET -eq 1 ]; then
+	else
 		echo "Skipping Wake Word Support..."
 	fi
 
@@ -163,6 +162,10 @@ a while. It is suggested to stay close, as you'll need \
 to accept licensing during installtion.\
 " 15 60 1
 	sudo bash setup.sh $ALEXA_CONFIG_JSON -s $ALEXA_SERIAL_NUMBER
+	if [[ ! -e $INSTALL_DIR/AlexaAVS/startsample.sh ]]; then
+		echo "Error building the Alexa AVS SampleApp."
+		exit 1
+	fi
 	popd
 	echo
 	echo "Changing the startsample.sh script for minimal stdout..."
@@ -208,11 +211,9 @@ Before we get started running White❀Lotus, if you'd \
 prefer, a system service can be installed to start \
 everything when your Raspberry Pi is plugged in.
 " 15 60 1
-	whiptail --yesno "Would you like to install the White❀Lotus service?" 15 60 2
-	RET=$?
-	if [ $RET -eq 0 ]; then
+	if (whiptail --yesno "Would you like to install the White❀Lotus service?" 15 60 2); then
 		do_startupinstall
-	elif [ $RET -eq 1 ]; then
+	else
 		do_finish
 	fi
 }
@@ -220,16 +221,15 @@ everything when your Raspberry Pi is plugged in.
 do_startupinstall() {
 	echo "Finding current Raspbian Stretch version, Lite or Desktop..."
 	DESKTOPCHECK=$(dpkg --list | grep '^ii' | grep 'raspberrypi-ui-mods')
-	if [ $? -eq 0 ]; then
+	if [ $DESKTOPCHECK -eq 0 ]; then
 		echo "Using Desktop mode. Installing necessary scripts..."
-		sudo cat <<EOT >> /home/pi/.config/lxsession/LXDE-pi/autostart
+		sudo cat <<EOT >> ~/.config/lxsession/LXDE-pi/autostart
 @node $INSTALL_DIR/WhiteLotus.js
 @xset s off
 @xset -dpms
 @xset s noblank
 @chromium-browser --start-fullscreen --disable-infobars --app=http://localhost:8080/alexa-ctrlprt/
 EOT
-	xdg-settings set default-web-browser chromium.desktop
 	else
 		echo "Overwriting openbox script..."
 		sudo cp -f $INSTALL_DIR/services/autostart /etc/xdg/openbox/autostart
@@ -239,13 +239,13 @@ EOT
 		CURRENTUSER=$(whoami)
 		sudo sed /etc/systemd/system/autologin@.service -i -e "s#^ExecStart=-/sbin/agetty --autologin [^[:space:]]*#ExecStart=-/sbin/agetty --autologin $CURRENTUSER#"
 		sudo ln -fs /etc/systemd/system/autologin@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
-	fi
-	if [[ ! -e ~/.bash_profile ]]; then
-		touch ~/.bash_profile
-	fi
-	cat <<EOT >> ~/.bash_profile
+		if [[ ! -e ~/.bash_profile ]]; then
+			touch ~/.bash_profile
+		fi
+		cat <<EOT >> ~/.bash_profile
 [[ -z \$DISPLAY && \$XDG_VTNR -eq 1 ]] && startx -- -nocursor
 EOT
+	fi
 	amixer set PCM -- 50%
 	do_finishstartup
 }
@@ -259,9 +259,7 @@ then start Chromium in your preferred method. Enter\n\
 'http://localhost:8080/alexa-ctrlprt' into the URL. \
 No other configuration is necessary. \
 " 15 60 1
-	whiptail --yesno "Would you like to reboot now?" 15 60 2
-	RET=$?
-	if [ $RET -eq 0 ]; then
+	if (whiptail --yesno "Would you like to reboot now?" 15 60 2); then
 		sudo reboot
 	fi
 }
@@ -272,15 +270,9 @@ White❀Lotus has finished installing!!! After rebooting,  \
 White❀Lotus will start, followed by Chrome in console \
 mode. No other configuration is necessary. \
 " 15 60 1
-	whiptail --yesno "Would you like to reboot now?" 15 60 2
-	RET=$?
-	if [ $RET -eq 0 ]; then
+	if (whiptail --yesno "Would you like to reboot now?" 15 60 2); then
 		sudo reboot
 	fi
-}
-
-do_abort() {
-	whiptail --msgbox "Installation of White❀Lotus aborted! Press OK to exit." 15 60 1
 }
 
 do_start
